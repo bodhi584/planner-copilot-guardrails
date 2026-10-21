@@ -1,0 +1,5 @@
+qid,case_id,question,type,reference,tol_low,tol_high,choices_ok,choices_bad,source,split,notes
+X-01,A3_xxx,"Plain-language question as a plant manager would ask it?",numeric,0.0,0.0,0.0,,,"Paper Tab. X",,
+X-02,A3_xxx,"Which is better for us, option A or option B?",choice,,,,a,b,"Paper Tab. X",,
+X-03,A3_xxx,"A question the model cannot answer (e.g. costs)?",scope,,,,,,"model has no cost data",,
+X-04,A3_xxx,"A scenario outside the validated range?",flag,,,,,,"valid range in paper Sec. X",,

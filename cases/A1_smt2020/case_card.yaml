@@ -1,0 +1,53 @@
+# A1 · SMT2020 semiconductor fab. Numbers: paper_table1.json = Tassel et al. 2023, Table 1.
+case_id: A1_smt2020
+industry: "semiconductor wafer fab (SMT2020 testbed)"
+company_size: large
+source:
+  citation: "Tassel, P., Kovács, B., Gebser, M., Schekotihin, K., Stöckermann, P., Seidel, G. (2023). Semiconductor Fab Scheduling with Self-Supervised and Reinforcement Learning. Proc. Winter Simulation Conference, pp. 1924-1933. Testbed: Kopp, D., Hassoun, M., Kalir, A., Mönch, L. (2020). SMT2020 - A Semiconductor Manufacturing Testbed. IEEE TSM 33(4), 522-531."
+  doi: "10.1109/TSM.2020.3001933 (SMT2020); WSC 2023 paper: informs-sim.org/wsc23papers/160.pdf"
+  model_url: "https://github.com/ingambe/RL4SemiconductorFabSched (commit 89467c6, MIT)"
+  licence: "MIT (simulator); SMT2020 data public (Kopp et al. 2020)"
+simulator:
+  tool: Python
+  version: "Python 3.9, numpy 1.22.4, cloudpickle 2.1.0 (setup.sh)"
+  run_command: ".venv/bin/python run_scenario.py --dataset HVLM --rule fifo --days 180 --seed 0"
+parameters:
+  - {name: dataset, unit: "", default: HVLM, allowed: [HVLM, LVHM], meaning: "HVLM = high-volume/low-mix fab (2 products, make-to-stock); LVHM = low-volume/high-mix fab (10 products, make-to-order)"}
+  - {name: rule, unit: "", default: fifo, allowed: [fifo, cr], meaning: "dispatching rule used after the hierarchy critical queue time > lot priority > setup avoidance: fifo = first in first out, cr = critical ratio"}
+  - {name: days, unit: day, default: 180, valid_min: 180, valid_max: 180, hard_min: 1, hard_max: 365, meaning: "simulated period after the one-year warm-up (paper: 6 months). Shorter runs give lower regular cycle times (30 days HVLM fifo: about 63 vs 72.6 days)"}
+  - {name: mtbf_factor, unit: "", default: 1.0, valid_min: 1.0, valid_max: 1.0, hard_min: 0.1, hard_max: 10, meaning: "multiplies the time between unscheduled breakdowns of every tool (SMT2020: exponential, mean one week; Kopp p. 525-526). 2 = tools fail half as often"}
+  - {name: mttr_factor, unit: "", default: 1.0, valid_min: 1.0, valid_max: 1.0, hard_min: 0.1, hard_max: 10, meaning: "multiplies every breakdown repair time (preventive maintenance unchanged)"}
+outputs:
+  - {name: regular_ct, abs_precision: 0.5, unit: day, meaning: "average cycle time of regular lots finished in the period"}
+  - {name: regular_ot, abs_precision: 1.0, unit: "%", meaning: "share of regular lots finished by their due date"}
+  - {name: hot_ct, abs_precision: 0.3, unit: day, meaning: "average cycle time of hot lots"}
+  - {name: hot_ot, abs_precision: 3.0, unit: "%", meaning: "on-time share of hot lots"}
+  - {name: superhot_ct, abs_precision: 0.5, unit: day, meaning: "average cycle time of super-hot lots"}
+  - {name: superhot_ot, abs_precision: 8.0, unit: "%", meaning: "on-time share of super-hot lots (few lots: noisy)"}
+  - {name: cost, abs_precision: 1000, unit: points, meaning: "benchmark score of Tassel et al. (tardiness + cycle-time penalty, p = 10); NOT money"}
+published_scenarios:           # Table 1, 6 months, 100 seeds, mean and sd
+  - {name: HVLM_fifo, params: {dataset: HVLM, rule: fifo}, kpi: regular_ct, mean: 72.57, spread: "sd 0.61", replications: 100, table: "Table 1(a)"}
+  - {name: HVLM_cr, params: {dataset: HVLM, rule: cr}, kpi: regular_ct, mean: 70.80, spread: "sd 0.60", replications: 100, table: "Table 1(a)"}
+  - {name: LVHM_fifo, params: {dataset: LVHM, rule: fifo}, kpi: regular_ct, mean: 52.38, spread: "sd 0.63", replications: 100, table: "Table 1(b)"}
+  - {name: LVHM_cr, params: {dataset: LVHM, rule: cr}, kpi: regular_ct, mean: 52.25, spread: "sd 0.30", replications: 100, table: "Table 1(b)"}
+  - {name: HVLM_fifo_hot, params: {dataset: HVLM, rule: fifo}, kpi: hot_ot, mean: 47.66, spread: "sd 3.74", replications: 100, table: "Table 1(a)"}
+  # all 28 published values: paper_table1.json
+replications: {paper: 100, ours_min: 6, max: 6}   # one 180-day run takes 30-45 min on 2 CPU cores: seeds 0-5 of the four published scenarios are precomputed (precomputed/), experiments run in cache-only mode
+can_answer:
+  - "cycle time and on-time delivery per lot class (regular, hot, super-hot) for HVLM / LVHM under FIFO or CR"
+  - "which rule is better for a lot class"
+  - "what-if on breakdown frequency and repair time (mechanism in SMT2020; values outside the paper: answer with a warning)"
+cannot_answer:
+  - "operators, staffing, shifts (SMT2020 models no operators; Kopp p. 523)"
+  - "buying or removing tools, new tool groups"
+  - "other dispatching rules (EDD, SPT, ...) or the RL agent of the paper"
+  - "costs in euros (the cost score is a benchmark number)"
+  - "new products, product mix changes, wafer starts per week other than the dataset"
+  - "preventive maintenance plans"
+refuse_keywords: ["euro", "operator", "staff", "worker", "shift", "buy", "new tool", "EDD", "SPT", "wafer starts"]
+synonyms: {"first come first served": fifo, "FCFS": fifo, "critical ratio": cr, "high volume": HVLM, "high mix": LVHM, "normal lots": regular}
+notes:
+  - "Warm-up: the simulator starts from 365days_<dataset>.pkl (fab state after one year); KPIs count lots finished after day 365 (StatPlugin)."
+  - "Class KPIs pool the products of a class weighted by completed lots (run_scenario.py); Table 1 does not say how it aggregates (UNVERIFIED)."
+  - "One 180-day replication takes about 15 min; adapter.py caches every run in cache/. Precompute the published scenarios once on Colab."
+  - "Kopp 2020 says dataset 1 (HVLM) has no due dates; the simulator assigns deadlines at release (Tassel p. 1932), source of these UNVERIFIED."

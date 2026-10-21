@@ -1,0 +1,28 @@
+Output copied from the Colab run of 14 Oct 2026 (JaamSim built from GitHub HEAD, reports state SoftwareVersion 2026-06; the Zenodo .rep files state 2026-05).
+MD5 of the 7 downloaded Zenodo files: all equal to the values on the Zenodo record page (see model/README.md).
+overtime = CompleteOrder PortfolioCompletion (h) - 104 h (Friday shift end, ShiftCalendar minute 6240). Utilisation = share of simulated time.
+
+=== M3 norm  reps ours/published: 30 30   (expert_values.json: overtime 3.31 h, unfinished 4.4)
+ot    ours mean 3.3121 sd 0.4245 | published mean 3.3121 sd 0.4245 | max |diff| per rep 0.00e+00
+unf   ours mean 4.4000 sd 0.5632 | published mean 4.4000 sd 0.5632 | max |diff| per rep 0.00e+00
+sheet ours mean 0.3237 sd 0.0025 | published mean 0.3237 sd 0.0025 | max |diff| per rep 0.00e+00
+tube  ours mean 0.2544 sd 0.0010 | published mean 0.2544 sd 0.0010 | max |diff| per rep 0.00e+00
+punch ours mean 0.1076 sd 0.0004 | published mean 0.1076 sd 0.0004 | max |diff| per rep 0.00e+00
+bend  ours mean 0.2639 sd 0.0014 | published mean 0.2639 sd 0.0014 | max |diff| per rep 0.00e+00
+=== M3 over20  reps ours/published: 30 30   (expert_values.json: overtime 11.54 h, unfinished 15.2)
+ot    ours mean 11.5448 sd 0.5850 | published mean 11.5448 sd 0.5850 | max |diff| per rep 0.00e+00
+unf   ours mean 15.1667 sd 0.7915 | published mean 15.1667 sd 0.7915 | max |diff| per rep 0.00e+00
+sheet ours mean 0.3607 sd 0.0027 | published mean 0.3607 sd 0.0027 | max |diff| per rep 0.00e+00
+tube  ours mean 0.2837 sd 0.0014 | published mean 0.2837 sd 0.0014 | max |diff| per rep 0.00e+00
+punch ours mean 0.1199 sd 0.0006 | published mean 0.1199 sd 0.0006 | max |diff| per rep 0.00e+00
+bend  ours mean 0.2945 sd 0.0020 | published mean 0.2945 sd 0.0020 | max |diff| per rep 0.00e+00
+
+4-worker variants (our own runs, 30 reps each; 4th worker's break position inside the break window is an UNVERIFIED assumption):
+A 4th at 0.25        norm   n=30 workers=4.0 overtime mean -3.026 sd 0.099 | unfinished mean 0.00 | pilot ref -3.03
+A 4th at 0.25        over20 n=30 workers=4.0 overtime mean 3.602 sd 0.038 | unfinished mean 4.00 | pilot ref 3.66
+B 4th at 0.75        norm   n=30 workers=4.0 overtime mean -3.026 sd 0.099 | unfinished mean 0.00 | pilot ref -3.03
+B 4th at 0.75        over20 n=30 workers=4.0 overtime mean 3.656 sd 0.311 | unfinished mean 4.03 | pilot ref 3.66
+C even 0,1/3,2/3,1   norm   n=30 workers=4.0 overtime mean -3.026 sd 0.099 | unfinished mean 0.00 | pilot ref -3.03
+C even 0,1/3,2/3,1   over20 n=30 workers=4.0 overtime mean 3.656 sd 0.311 | unfinished mean 4.03 | pilot ref 3.66
+D 4th at 0.5         norm   n=30 workers=4.0 overtime mean -3.026 sd 0.099 | unfinished mean 0.00 | pilot ref -3.03
+D 4th at 0.5         over20 n=30 workers=4.0 overtime mean 3.602 sd 0.038 | unfinished mean 4.00 | pilot ref 3.66

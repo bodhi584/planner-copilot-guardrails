@@ -1,0 +1,52 @@
+# A5 · Operator-paced assembly line. Rebuild of a published Arena model in SimPy; inputs cited per figure in model.py.
+case_id: A5_operator_line
+industry: "assembly of building-supply products (operator-paced line, 4 cells)"
+company_size: SME            # UNVERIFIED: paper says "a client", size not given
+source:
+  citation: "Seppanen, M. S. (2005). Operator-Paced Assembly Line Simulation. In Proceedings of the 2005 Winter Simulation Conference, pp. 1343-1349."
+  doi: "10.1109/WSC.2005.1574396"
+  model_url: "https://informs-sim.org/wsc05papers/164.pdf (paper); original Arena 8.01 model was at factory.engr.stthomas.edu/simulation/operator/ (not retrieved). This case is our SimPy rebuild."
+  licence: "paper: WSC proceedings, open access; our rebuild: repository licence"
+simulator:
+  tool: SimPy
+  version: "simpy 4"
+  run_command: "python reproduce.py"
+parameters:
+  - {name: operators, unit: persons, default: 3, valid_min: 2, valid_max: 4, hard_min: 2, hard_max: 12, meaning: "operators in the shared pool (paper: 2, 3, 4). Cell 4 needs two at once, so at least 2"}
+  - {name: buffer_1, unit: units, default: 1, valid_min: 1, valid_max: 1, hard_min: 0, hard_max: 50, meaning: "buffer between cell 1 and 2 (paper: 1 only)"}
+  - {name: buffer_2, unit: units, default: 2, valid_min: 2, valid_max: 2, hard_min: 0, hard_max: 50, meaning: "buffer between cell 2 and 3 (paper: 2 only)"}
+  - {name: buffer_3, unit: units, default: 1, valid_min: 1, valid_max: 1, hard_min: 0, hard_max: 50, meaning: "buffer between cell 3 and 4 (paper: 1 only)"}
+  - {name: failure_rate_factor, unit: "", default: 1.0, valid_min: 1.0, valid_max: 1.0, hard_min: 0.1, hard_max: 10, meaning: "multiplies how often every cell fails (1 = paper: mean up time 294 min, cell 3: 285 min)"}
+  - {name: repair_time_factor, unit: "", default: 1.0, valid_min: 1.0, valid_max: 1.0, hard_min: 0.1, hard_max: 10, meaning: "multiplies the mean repair time (1 = paper: 6 min, cell 3: 15 min)"}
+outputs:
+  - {name: units_per_shift, abs_precision: 8, unit: units, meaning: "assembled units leaving cell 4 in one 8 h shift"}
+  - {name: units_per_operator, abs_precision: 2, unit: units, meaning: "units per shift divided by operators"}
+  - {name: cycle_time_s, abs_precision: 2, unit: s, meaning: "effective cycle time = 28,800 s / units per shift (as in Fig. 16)"}
+  - {name: operator_moves, abs_precision: 20, unit: moves, meaning: "trips of an operator to a different cell (Fig. 16 counts are matched better by _extras.operator_move_segments)"}
+  - {name: operator_busy_pct, abs_precision: 1, unit: "%", meaning: "share of the 480 min operators spend on assembly, duties and repairs (not in the paper)"}
+published_scenarios:          # Fig. 16, 10 replications of one shift, spread = 95% CI half-width
+  - {name: ops2, params: {operators: 2}, kpi: units_per_shift, mean: 223, spread: "95% CI 214-232 (hw 9)", replications: 10, table: "Fig. 16"}
+  - {name: ops3, params: {operators: 3}, kpi: units_per_shift, mean: 320, spread: "95% CI 305-335 (hw 15)", replications: 10, table: "Fig. 16"}
+  - {name: ops4, params: {operators: 4}, kpi: units_per_shift, mean: 348, spread: "95% CI 335-361 (hw 13)", replications: 10, table: "Fig. 16"}
+  - {name: ops2_moves, params: {operators: 2}, kpi: operator_moves, mean: 2196, spread: "not given", replications: 10, table: "Fig. 16"}
+  - {name: ops3_moves, params: {operators: 3}, kpi: operator_moves, mean: 1748, spread: "not given", replications: 10, table: "Fig. 16"}
+  - {name: ops4_moves, params: {operators: 4}, kpi: operator_moves, mean: 473, spread: "not given", replications: 10, table: "Fig. 16"}
+replications: {paper: 10, ours_min: 10, max: 100}
+can_answer:
+  - "throughput per shift with 2-4 operators"
+  - "productivity per operator; is a 4th operator worth it"
+  - "what-if on buffer sizes, failure frequency, repair time (mechanism in the model, values not validated: answer with a warning)"
+cannot_answer:
+  - "costs, wages, euros"
+  - "new cells, new products, changed cycle times of individual cells"
+  - "operator skills or training (paper assumes all operators equal and in one pool)"
+  - "overtime, second shift, shift length other than 480 min"
+  - "quality / scrap rates of finished units (rejects are input material only)"
+refuse_keywords: ["euro", "cost", "wage", "salary", "training", "new cell", "second shift", "overtime"]
+synonyms: {"workers": operators, "staff": operators, "breakdowns": failure_rate_factor}
+notes:
+  - "Rebuild, not the original model. Four inputs are not in the paper and were calibrated (calibrate.py): walking time 1.0 s per cell, transit 5 s, assembly-time CV 0, freed operator serves the most downstream waiting cell first."
+  - "Hold-out check: calibrating on 2 and 4 operators only predicts 3 operators at 331-335 units (published 320, CI 305-335)."
+  - "reproduce.py with 100 replications (seeds 1001-1100): 221.8 / 334.0 / 358.7 units, all inside the published CIs; 3 and 4 operators sit near the upper edge (+4.4%, +3.1%)."
+  - "Operator moves: published counts match 'cells walked past' (2,059 / 1,973 / 511 vs 2,196 / 1,748 / 473), not trips; the paper does not define the count."
+  - "Each run is one 8 h shift from an empty line, breaks per Fig. 9 stop the operators; cell 3 (automatic) keeps running."

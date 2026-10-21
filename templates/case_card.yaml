@@ -1,0 +1,24 @@
+# Copy to cases/<case_id>/case_card.yaml and fill in. Take every number from the paper (cite table/page).
+case_id: A3_xxx
+industry: ""
+company_size: SME            # SME | large
+source:
+  citation: ""
+  doi: ""
+  model_url: ""
+  licence: ""
+simulator:
+  tool: JaamSim              # JaamSim | SimPy | Python
+  version: ""
+  run_command: ""
+parameters:                  # everything a user may change
+  - {name: workers, unit: persons, default: 3, valid_min: 3, valid_max: 4, meaning: "operators per shift"}
+outputs:                     # KPIs the model reports
+  - {name: overtime_after_shift, unit: h, meaning: "hours after Friday shift end until all orders are finished"}
+published_scenarios:         # expert results from the paper
+  - {name: base, params: {workers: 3}, kpi: overtime_after_shift, mean: 0.0, spread: "sd 0.0", replications: 30, table: "Tab. X"}
+replications: {paper: 30, ours_min: 10}
+can_answer: []
+cannot_answer: ["costs in euros", "new process steps", "demand forecasts"]
+synonyms: {}                 # plain words -> parameter values, e.g. {"first come first served": FIFO}
+notes: []                    # warm-up, units, known pitfalls

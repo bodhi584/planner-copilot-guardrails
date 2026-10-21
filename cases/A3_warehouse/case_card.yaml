@@ -1,0 +1,51 @@
+# A3 · Pallet warehouse with reach trucks. Numbers from model/exp_results_v2.json (author's file).
+case_id: A3_warehouse
+industry: "warehousing / logistics (pallet warehouse with reach trucks, Thailand)"
+company_size: large            # UNVERIFIED: 1,134 storage locations, 9 reach trucks per sim_interleaving.py comments
+source:
+  citation: "Saengphueng, S. (2026). Code and Data for: Task Interleaving in Warehouse Operations: A Discrete-Event Simulation Analysis of Dispatching Rules and Task-Holding Policies [Software/dataset]. Zenodo, v1, 21 Jul 2026."
+  doi: "10.5281/zenodo.21469786"
+  model_url: "https://zenodo.org/records/21469786"
+  licence: "MIT (model/LICENSE.txt); redistributed here with the licence file"
+  linked_paper: "same title; journal/venue not given on Zenodo (UNVERIFIED whether published). Element times come from an earlier work-measurement study named in the code header: 'Assessment of Task Interleaving to Enhance Material Handling Equipment Efficiency in Warehouse Operations' (citation UNVERIFIED)."
+simulator:
+  tool: SimPy
+  version: "simpy 4 (any 4.x worked, UNVERIFIED for older)"
+  run_command: "python reproduce.py"
+parameters:
+  - {name: reach_trucks, unit: trucks, default: 9, valid_min: 6, valid_max: 12, hard_min: 1, hard_max: 40, meaning: "number of reach trucks, each with its driver (published grid 6-12)"}
+  - {name: policy, unit: "", default: SINGLE, allowed: [SINGLE, INTERLEAVE, NEAREST], meaning: "SINGLE = one task per trip (current practice); INTERLEAVE = after a put-away take the oldest waiting pick on the way back; NEAREST = take the nearest waiting pick"}
+  - {name: hold_time, unit: min, default: 1.5, valid_min: 0, valid_max: 10, hard_min: 0, hard_max: 120, meaning: "minutes a pick order is held for returning trucks before an idle truck may take it (no effect under SINGLE)"}
+  - {name: demand_factor, unit: "", default: 1.0, valid_min: 0.8, valid_max: 1.2, hard_min: 0.1, hard_max: 3.0, meaning: "multiplier on January 2025 daily demand (740 put-away + 831 pick pallets per day)"}
+outputs:
+  - {name: pallets_per_day, abs_precision: 15, unit: pallets, meaning: "pallets handled in one 8 h shift (put-away + picking)"}
+  - {name: empty_travel_pct, abs_precision: 0.5, unit: "%", meaning: "share of truck travel time driven empty"}
+  - {name: truck_utilisation_pct, abs_precision: 1.0, unit: "%", meaning: "average busy time of the reach-truck fleet"}
+  - {name: mean_wait_min, abs_precision: 0.5, unit: min, meaning: "average time a task waits before a truck starts it"}
+  - {name: pick_cycle_min, abs_precision: 0.5, unit: min, meaning: "average time from pick order creation to pallet at drop-off"}
+  - {name: interleave_rate_pct, abs_precision: 1.0, unit: "%", meaning: "share of put-away trips combined with a pick"}
+published_scenarios:            # spread = sd, computed from the 95% CI half-width (h * sqrt(30) / 1.96)
+  - {name: fleet6_single, params: {reach_trucks: 6, policy: SINGLE}, kpi: mean_wait_min, mean: 10.713, spread: "sd 6.528", replications: 30, table: "exp_results_v2.json fleet/6"}
+  - {name: fleet6_interleave, params: {reach_trucks: 6, policy: INTERLEAVE}, kpi: mean_wait_min, mean: 1.784, spread: "sd 0.337", replications: 30, table: "exp_results_v2.json fleet/6"}
+  - {name: fleet9_single, params: {reach_trucks: 9, policy: SINGLE}, kpi: truck_utilisation_pct, mean: 67.427, spread: "sd 2.865", replications: 30, table: "exp_results_v2.json fleet/9"}
+  - {name: fleet12_single, params: {reach_trucks: 12, policy: SINGLE}, kpi: truck_utilisation_pct, mean: 50.325, spread: "sd 2.133", replications: 30, table: "exp_results_v2.json fleet/12"}
+  - {name: hold10_interleave, params: {reach_trucks: 9, policy: INTERLEAVE, hold_time: 10}, kpi: mean_wait_min, mean: 3.535, spread: "sd 0.403", replications: 30, table: "exp_results_v2.json hold/10.0"}
+  - {name: demand120_single, params: {reach_trucks: 9, policy: SINGLE, demand_factor: 1.2}, kpi: pallets_per_day, mean: 1848.133, spread: "sd 62.895", replications: 30, table: "exp_results_v2.json demand/1.2"}
+replications: {paper: 30, ours_min: 10, max: 100}
+can_answer:
+  - "effect of fleet size (6-12 trucks) on waiting time, utilisation, throughput"
+  - "which dispatching rule (single, interleave, nearest) is better for a KPI"
+  - "effect of the task-holding time and of demand +-20%"
+cannot_answer:
+  - "truck breakdowns, battery charging, maintenance (not modelled)"
+  - "driver breaks, shifts other than one 8 h shift"
+  - "costs in euros, buying trucks"
+  - "warehouse layout changes, new storage locations (distances are sampled uniformly 20-190 m)"
+  - "order picking of single cases or items (model handles 2-pallet cycles only)"
+refuse_keywords: ["euro", "cost", "breakdown", "battery", "charging", "layout", "break time"]
+synonyms: {"forklifts": reach_trucks, "dual command": INTERLEAVE, "single command": SINGLE}
+notes:
+  - "Reproduction 16 Oct 2026: reproduce.py re-runs all 60 published cells (20 settings x 3 policies, 30 reps): 360 of 360 KPI means identical (same seeds 42..71)."
+  - "pallets_per_day is demand-driven: it barely changes with fleet size above 6 trucks; waiting time and utilisation are the informative KPIs for fleet questions."
+  - "Warm-up 60 min, then one 480 min shift (Params defaults). Arrivals Poisson; element times triangular (Tables 4 and 9 of the work-measurement study, per code comments)."
+  - "The author marks several inputs as TODO in the code (distance table approximated, stationary arrivals): the model is the author's, we use it as published."

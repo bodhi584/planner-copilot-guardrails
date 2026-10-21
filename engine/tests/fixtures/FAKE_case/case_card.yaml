@@ -1,0 +1,20 @@
+# Fake case used by the engine tests. Same shape as a real case card (templates/case_card.yaml).
+case_id: FAKE_case
+parameters:
+  - {name: workers, unit: persons, default: 3, valid_min: 3, valid_max: 4, hard_min: 1, hard_max: 10, meaning: "operators sharing all machines"}
+  - {name: portfolio, unit: "-", allowed: [norm, over20], meaning: "weekly order book (no default: the caller must choose)"}
+  - {name: shift_length, unit: min, default: 480, valid_min: 480, valid_max: 480, hard_min: 120, hard_max: 1440, hint: "looks like hours; give minutes, 8 h = 480", meaning: "length of each of the 5 daily shifts"}
+  - {name: rush_share, unit: "%", default: 10, valid_min: 0, valid_max: 50, hard_min: 0, hard_max: 100, validated: false, meaning: "share of rush orders"}
+outputs:
+  - {name: overtime_after_shift, unit: h, meaning: "hours after Friday shift end until all orders are finished"}
+  - {name: late_orders, unit: orders, abs_precision: 2.0, meaning: "orders not finished at Friday shift end"}
+replications: {paper: 30, ours_min: 10, max: 30}
+can_answer: ["overtime for the normal or the +20% order book", "effect of a 4th worker"]
+cannot_answer: ["costs in euros", "buying or removing machines"]
+refuse_keywords: ["euro", "cost", "buy"]
+synonyms:
+  busy week: {portfolio: over20}
+  normal week: {portfolio: norm}
+  extra operator: {workers: 4}
+notes:
+  - "Fake model for tests only: lognormal work per order, 69 (norm) or 83 (over20) orders per week."

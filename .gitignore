@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv*/
+.ipynb_checkpoints/
+*.egg-info/
+build/
+dist/
+.env
+# simulators and run output created by the setup scripts
+cases/A1_smt2020/RL4SemiconductorFabSched/
+cases/A1_smt2020/cache/
+cases/A2_sme/jaamsim
+cases/A2_sme/runs/
+eval/results/answers.csv
+.gradio/

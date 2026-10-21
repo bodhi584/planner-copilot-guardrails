@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install ".[dev]"
+      - run: python -m pytest -q
+
+  reproduce:
+    name: reproduce published results
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: pip install ".[dev]"
+      - name: A1 semiconductor fab (stored runs vs. published Table 1)
+        run: cd cases/A1_smt2020 && A1_CACHE_ONLY=1 python reproduce.py 6
+      - name: A2 sheet-metal job shop (JaamSim, replication by replication)
+        run: cd cases/A2_sme && bash setup.sh && python reproduce.py
+      - name: A3 pallet warehouse (360 published KPI means)
+        run: cd cases/A3_warehouse && python reproduce.py

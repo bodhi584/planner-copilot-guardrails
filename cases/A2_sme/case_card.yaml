@@ -1,0 +1,64 @@
+# A2 · SME sheet-metal job shop.
+# Status: DRAFT v1 (14 Oct). Reproduction done: our 30-replication run of M3 norm and over20 equals the published .rep files
+# replication by replication (see reproduce_output_2026-10-14.txt). Values marked UNVERIFIED are still open.
+case_id: A2_sme
+industry: "sheet-metal job shop (laser cutting, punching, bending), anonymised SME"
+company_size: SME
+source:
+  citation: "Jurczyk-Bunkowska, M. (2026). JaamSim models, order portfolios, and replication results for capacity planning in an SME manufacturing system [Dataset]. Zenodo, v1, 8 Oct 2026."
+  doi: "10.5281/zenodo.23229885"
+  model_url: "https://zenodo.org/records/23229885"
+  licence: "CC BY 4.0 (Zenodo record page); attribution required"
+  linked_paper: "How Much Model Detail Is Enough? Discrete Event Simulation for Capacity Planning in SMEs (title as named on the Zenodo page; journal, year, DOI: UNVERIFIED, page not opened)"
+simulator:
+  tool: JaamSim
+  version: "published .rep files: JaamSim 2026-05; our build from GitHub HEAD (14 Oct run): 2026-06; results identical"
+  run_command: "bash cases/A2_sme/run.sh M3 norm   # or: M3 over20"
+model_variants:              # Zenodo description
+  M1: "simplified; aggregated processing-time variability"
+  M2: "more detailed; processing-time variability by sheet-thickness category"
+  M3: "extended; shared human-resource constraint and employee breaks  (the case uses M3)"
+parameters:                  # everything a user may change
+  - {name: workers, unit: persons, default: 3, valid_min: 3, valid_max: 4, hard_min: 1, hard_max: 12, hint: "number of operators, a whole number", meaning: "operators shared by all machines (cfg: ResourcePool ProductionWorkers = Worker1-3). 3 = expert model. 4 = our own run: Worker4 + Worker4Break added to the cfg; the 4th break position in the 180-240 min window is not given anywhere (UNVERIFIED). UNVERIFIED whether the paper itself validates 4"}
+  - {name: portfolio, unit: "-", default: norm, allowed: [norm, over20], meaning: "weekly order book: norm = normal week; over20 = same book with 20% more orders (portf_norm_clean.tsv / portf_over20_clean.tsv)"}
+  - {name: shift_length, unit: min, default: 480, valid_min: 480, valid_max: 480, hard_min: 240, hard_max: 720, hint: "minutes per shift: 8 h = 480, 9 h = 540, 10 h = 600", meaning: "length of each of the 5 Mon-Fri shifts (cfg ShiftCalendar: 0-480, 1440-1920, 2880-3360, 4320-4800, 5760-6240 min; Friday shift ends at minute 6240 = 104 h). Only 480 is validated; other values must carry a warning"}
+  - {name: machine_breakdowns, unit: "failures per machine running hour", default: 0, valid_min: 0, valid_max: 0, hard_min: 0, hard_max: 1, meaning: "NOT in the expert models (Zenodo: machine failures are excluded). Any value > 0 is outside the validated range and must warn. UNVERIFIED whether JaamSim cfg can be extended for this; the pilot SimPy replica had it as an add-on"}
+outputs:                     # KPIs the model reports
+  - {name: overtime_after_shift, unit: h, abs_precision: 0.15, meaning: "hours after Friday shift end until all orders are finished; negative = finished before shift end"}
+  - {name: unfinished_orders, unit: orders, abs_precision: 0.25, meaning: "orders not finished at Friday shift end"}
+  - {name: bottleneck_utilisation, unit: fraction, abs_precision: 0.005, meaning: "utilisation of the busiest machine (share of simulated time); per-machine utilisation and the bottleneck name are in the result extras (Zenodo page lists utilisation as a model output)"}
+published_scenarios:         # expert results; replace mean/spread with values computed from the *_30replikacji.rep files
+  - {name: M3_norm_3workers, params: {workers: 3, portfolio: norm}, kpi: overtime_after_shift, mean: 3.3121, spread: "sd 0.4245 (30 reps, computed from M3_norm_30replikacji.rep)", replications: 30, table: "Zenodo file M3_norm_30replikacji.rep; paper table UNVERIFIED (paper not opened)"}
+  - {name: M3_over20_3workers, params: {workers: 3, portfolio: over20}, kpi: overtime_after_shift, mean: 11.5448, spread: "sd 0.5850 (30 reps, computed from M3_over20_30replikacji.rep)", replications: 30, table: "Zenodo file M3_over20_30replikacji.rep; paper table UNVERIFIED"}
+  - {name: M3_norm_3workers_unfinished, params: {workers: 3, portfolio: norm}, kpi: unfinished_orders, mean: 4.4, spread: "sd 0.5632 (30 reps)", replications: 30, table: "Zenodo file M3_norm_30replikacji.rep; paper table UNVERIFIED"}
+  - {name: M3_over20_3workers_unfinished, params: {workers: 3, portfolio: over20}, kpi: unfinished_orders, mean: 15.1667, spread: "sd 0.7915 (30 reps)", replications: 30, table: "Zenodo file M3_over20_30replikacji.rep; paper table UNVERIFIED"}
+reference_runs:              # NOT published: our own headless re-runs of the expert M3 model with the worker count changed
+  - {name: M3_norm_4workers, params: {workers: 4, portfolio: norm}, kpi: overtime_after_shift, mean: -3.026, spread: "sd 0.099 (30 reps)", replications: 30, source: "our run, 4th worker break evenly spaced; pilot value -3.03 reproduced"}
+  - {name: M3_over20_4workers, params: {workers: 4, portfolio: over20}, kpi: overtime_after_shift, mean: 3.656, spread: "sd 0.311 (30 reps)", replications: 30, source: "our run, 4th worker break evenly spaced (or at 0.75); pilot value 3.66 reproduced. With the 4th break at 0.25 or 0.5 of the window: 3.602 (sd 0.038), i.e. sensitive to this unverified assumption"}
+replications: {paper: 30, ours_min: 10, max: 100}   # paper: 30 per model variant x portfolio (Zenodo page)
+can_answer:
+  - "overtime (hours after Friday shift end) for the normal or the +20% order book"
+  - "orders still unfinished at Friday shift end"
+  - "effect of a 4th worker on overtime"
+  - "which machine is the bottleneck (utilisation)"
+refuse_keywords: ["euro", "cost", "price", "buy", "purchase", "second bending machine", "new machine", "new product", "welding", "forecast"]
+cannot_answer:
+  - "costs in euros"
+  - "buying or removing machines (e.g. a second bending machine)"
+  - "new products or new process steps (e.g. welding after bending)"
+  - "demand forecasts or other order books than norm / over20"
+  - "defects and rework, material transport, workstation storage limits, NC-program preparation (excluded by the models, Zenodo page)"
+synonyms:
+  normal week: {portfolio: norm}
+  busy week: {portfolio: over20}
+  overloaded week: {portfolio: over20}
+  "+20% orders": {portfolio: over20}
+  extra operator: {workers: 4}
+notes:
+  - "Facts confirmed from the Zenodo page: 3 variants (M1-M3), 2 portfolios, 30 replications per combination, CC BY 4.0, JaamSim 2026-05, exclusions listed under cannot_answer."
+  - "Confirmed from M3_weekly_backlog.cfg and the .rep files (14 Oct): 4 machines (SheetLaser, TubeLaser, PunchingMachine, BendingMachine), 3 shared workers, 5 shifts of 480 min Mon-Fri, one 20-min break per worker per day (window 180-240 min, staggered 0 / 0.5 / 1), 30 replications, seeds 1..30 (GlobalSubstreamSeed), no warm-up, norm = 69 orders (CompleteOrder NumberProcessed 69). over20 order count: UNVERIFIED (82 lines in the tsv). All orders released Monday morning: UNVERIFIED."
+  - "KPI definitions (verified against the 30 published replications): overtime after shift end = CompleteOrder PortfolioCompletion (h) - 104 h; unfinished orders = FridaySnapshot UnfinishedOrders; utilisation = share of simulated time. Sheet laser is the bottleneck: 0.324 (norm), 0.361 (over20)."
+  - "Run time: 30 replications take about 6 s per scenario on a Colab CPU runtime (no GPU needed)."
+  - "Engine adapter (adapter.py, 15 Oct): reproduces the published M3 norm / over20 replications exactly (difference 0) and our 4-worker reference runs. More than 4 workers barely helps: there are only 4 machines, so a 5th or 6th operator is idle (6 workers over20: 3.60 h vs 3.66 h with 4; the small gap comes from break staggering). shift_length is supported by moving every shift end in the cfg (not validated: 9 h shifts give 5.8 h overtime in over20, inside the pilot range 4.0-8.0). machine_breakdowns > 0 is NOT supported by the expert model: decision pending (A2-14 flag vs scope)."
+  - "Acceptance check open: the published results on the Zenodo page differ by model variant and portfolio, not by resources. Whether the linked paper reports a scenario that changes a resource (acceptance standard) is UNVERIFIED; if not, the 4-worker scenario is a reference run, not a published one."
+  - "Report file names: the Zenodo file 'M2_over20_30 replikacji.rep' contains a space. Not used by the case (M3 only)."

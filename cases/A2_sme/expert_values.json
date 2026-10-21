@@ -1,0 +1,8 @@
+{
+  "source": "Jurczyk-Bunkowska (2026), JaamSim models and replication results for SME capacity planning, Zenodo record 23229885; values from the expert M3 model re-run headless in the pilot",
+  "kpi": "hours after Friday shift end until all orders are finished (negative = finished early); unfinished orders at Friday shift end",
+  "M3_norm_3workers":   {"overtime_h": 3.31,  "unfinished_orders": 4.4},
+  "M3_over20_3workers": {"overtime_h": 11.54, "unfinished_orders": 15.2},
+  "M3_norm_4workers":   {"overtime_h": -3.03},
+  "M3_over20_4workers": {"overtime_h": 3.66}
+}

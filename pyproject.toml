@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "planner-copilot"
+version = "1.0.0"
+description = "Guardrail engine that lets a local language model answer production-planning questions from validated simulation models"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Yu Han"}]
+requires-python = ">=3.10"
+dependencies = [
+  "pyyaml",
+  "numpy",
+  "scipy",
+  "pydantic>=2",
+  "jsonschema",
+  "langgraph",
+  "openai>=1",
+  "simpy",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=2,<3"]
+demo = ["gradio>=4"]
+dev = ["pytest", "mcp>=2,<3"]
+all = ["mcp>=2,<3", "gradio>=4", "pytest"]
+
+[tool.setuptools]
+packages = ["engine", "engine.adapters", "agent", "eval", "app"]
+
+[tool.setuptools.package-data]
+engine = ["result.schema.json"]
+agent = ["prompt_rules.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["engine/tests", "agent/tests"]

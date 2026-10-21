@@ -1,0 +1,1 @@
+{"regular_ct": 51.7, "regular_ot": 0.0, "hot_ct": 23.77, "hot_ot": 96.08, "superhot_ct": 33.34, "superhot_ot": 100.0, "cost": 106849.23, "dataset": "LVHM", "rule": "cr", "days": 180.0, "mtbf_factor": 1.0, "mttr_factor": 1.0, "seed": 0, "source": "colab_cpu_2026-10-16", "regular_completed": 9547, "hot_completed": 255, "superhot_completed": 10}

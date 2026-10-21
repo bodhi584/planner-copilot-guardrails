@@ -1,0 +1,5 @@
+{"HVLM":{"cr":{"regular_ct":[70.80,0.60],"regular_ot":[0.0,0.0],"hot_ct":[26.94,0.13],"hot_ot":[46.76,3.77],"superhot_ct":[33.89,0.43],"superhot_ot":[41.84,12.45],"cost":[39813.37,899.89]},
+         "fifo":{"regular_ct":[72.57,0.61],"regular_ot":[0.0,0.0],"hot_ct":[26.91,0.12],"hot_ot":[47.66,3.74],"superhot_ct":[33.99,0.44],"superhot_ot":[38.06,10.64],"cost":[38013.67,1327.73]}},
+ "LVHM":{"cr":{"regular_ct":[52.25,0.30],"regular_ot":[0.0,0.0],"hot_ct":[23.71,0.23],"hot_ot":[96.34,3.04],"superhot_ct":[33.73,0.42],"superhot_ot":[97.19,4.72],"cost":[108855.67,2044.28]},
+         "fifo":{"regular_ct":[52.38,0.63],"regular_ot":[0.06,0.09],"hot_ct":[23.80,0.23],"hot_ot":[95.38,3.35],"superhot_ct":[33.86,0.45],"superhot_ot":[95.04,5.44],"cost":[102170.71,2497.89]}},
+ "source":"Tassel et al., WSC 2023, Table 1; 6 months, 100 seeds, mean +- sd"}
