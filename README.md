@@ -65,7 +65,7 @@ Each model is published by its authors with results; each is reproduced here bef
 | [A1](cases/A1_smt2020/) | semiconductor fab (SMT2020) | Python simulator, Tassel et al. 2023 | 28 of 28 published values within tolerance |
 | [A2](cases/A2_sme/) | sheet-metal job shop (SME, 69 real orders) | JaamSim, Jurczyk-Bunkowska 2026 | identical to the 30 published replications |
 | [A3](cases/A3_warehouse/) | pallet warehouse with reach trucks | SimPy, Saengphueng 2026 | 360 of 360 published KPI means identical |
-| [A5](cases/A5_operator_line/) | operator-paced assembly line | SimPy rebuild of Seppanen 2005 | inside the published 95 % CIs |
+| [A5](cases/A5_operator_line/) | operator-paced assembly line | SimPy rebuild of Seppanen 2005 | inside the published 95 % CIs with 100 replications; 3 and 4 operators at the upper edge |
 
 The reproductions of A1, A2 and A3 run in CI on every push.
 
