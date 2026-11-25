@@ -14,3 +14,9 @@ Only failures on the **train** split may lead to a rule change. Validation resul
    is a refusal. The old expected value came from the SimPy pilot replica, not from the expert model.
 Not changed on purpose: A3-20 (layout question passed the scope check) and A3-13 (model did not compare) stay as found,
 to avoid tuning on test items; they are reported as limitations.
+
+## 2026-11-25: rules frozen for the test (eval/PROTOCOL.md)
+No check, case card (A1–A5), prompt, prompt rule or grading rule changes from here on (tag `eval-freeze-v1`).
+Added the same day, before the freeze and before any test answer: experiment switches in `eval/run.py`
+(`--off`, `--temperature`, `--seed-base`, `--label`; defaults change nothing) and the sealed test questions
+(`cases/*/questions_test.csv`, hashes in `eval/test_set.sha256`).

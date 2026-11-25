@@ -24,11 +24,11 @@ ARM_TOOLS = {"A": ["raw_simulate"], "B": ["raw_simulate"], "C": ["capabilities",
 
 
 class Toolbox:
-    def __init__(self, cases_root, arm, case_id, question):
+    def __init__(self, cases_root, arm, case_id, question, off=()):
         if arm not in ARMS:
             raise ValueError(f"arm must be one of {ARMS}")
         self.arm, self.case_id, self.question = arm, case_id, question
-        self.engine = Engine(cases_root)
+        self.engine = Engine(cases_root, checks={k: False for k in off})  # off: ablation, setup C with these checks switched off
         self.raw_engine = Engine(cases_root, checks={k: False for k in ("scope", "units", "validity", "adaptive_reps", "paired")})
         self.names = ARM_TOOLS[arm]
 

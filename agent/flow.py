@@ -184,9 +184,9 @@ def build(box: Toolbox, llm, rules=None):
     return g.compile()
 
 
-def answer(question, case_id, arm, llm, cases_root="cases", rules_path=None, check_value=True) -> dict[str, Any]:
+def answer(question, case_id, arm, llm, cases_root="cases", rules_path=None, check_value=True, off=()) -> dict[str, Any]:
     t0 = time.time()
-    box = Toolbox(cases_root, arm, case_id, question)
+    box = Toolbox(cases_root, arm, case_id, question, off=off)
     rules = None
     if arm == "B":
         from .make_prompt_rules import section
