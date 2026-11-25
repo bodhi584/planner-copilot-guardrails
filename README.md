@@ -60,6 +60,7 @@ The rules were frozen and the [protocol](eval/PROTOCOL.md) written before 40 new
 - **Fewer confidently wrong answers for every model (7→3, 12→8, 14→11), but not significant with 40 questions** (p = 0.17–0.27). The ≤ 2 % target is not met (Qwen: 8 %).
 - The gain sits where a rule is a computation: validity warnings 2/21 → 20/21, numeric answers 27/48 → 43/48 (summed over models). Out-of-scope questions do not improve (18/27 → 16/27): the keyword-based scope check misses rephrased questions.
 - Stable under sampling: Qwen at temperature 0.7, three seeds, setup C: 35, 37, 35 correct.
+- **Ablation** (Qwen, setup C, one check off at a time): without the validity check 37 → 30 correct and 3 → 10 confidently wrong; without adaptive replications 28 correct and 8 confidently wrong; without the scope check 34 correct and 6 confidently wrong. Switching off the unit, paired-comparison or value check changed no answer on this test set, so their value is not shown by it.
 
 ### Development runs (80 questions)
 
@@ -131,6 +132,7 @@ Run the evaluation: see [`eval/`](eval/).
 - The value check confirms that a number came from the simulator, not that its unit matches the question (units per hour answered with units per shift).
 - The guardrail is only as good as the case card; where a validated range is an assumption (A2: the fourth worker), the card says so.
 - A1 answers come from stored runs of the four published scenarios; other A1 scenarios would need the 30–45 min simulator runs.
+- The unit, paired-comparison and value checks are not exercised by the test set (ablation: no change), so the test supports only the validity, replication and scope checks.
 - 40 test questions are too few to show a significant drop in confidently wrong answers; the test questions were written by the system's author (after the freeze, by script, hashed).
 
 ## Repository
