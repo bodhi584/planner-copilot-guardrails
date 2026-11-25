@@ -53,7 +53,7 @@ switch ($Stage) {
   "T2" { Run (@("--questions") + $Test + @("--arms", "A,B,C", "--model", $Models[0], "--temperature", "0.7", "--seed-base", "1", "--repeats", "3", "--out", "$Out\T2_qwen_repeats.csv")) }
   "T3" {
     foreach ($c in @("scope", "units", "validity", "adaptive_reps", "paired", "value_check")) {
-      Run (@("--questions") + $Test + @("--arms", "C", "--model", $Models[0], "--off", $c, "--label", "-off_$c", "--out", "$Out\T3_qwen_ablation.csv"))
+      Run (@("--questions") + $Test + @("--arms", "C", "--model", $Models[0], "--off", $c, "--label=-off_$c", "--out", "$Out\T3_qwen_ablation.csv"))
     }
   }
   "D4" { Run (@("--questions") + $Dev + @("--arms", "A,B,C", "--model", $Models[1], "--out", "eval\results\run6_llama3_1_8b_dev.csv")) }

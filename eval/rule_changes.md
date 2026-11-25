@@ -23,3 +23,5 @@ Added the same day, before the freeze and before any test answer: experiment swi
 2026-11-25, after the freeze, before any test answer (harness only, no rule): `cases/A2_sme/adapter.py` joins the Java
 classpath with `os.pathsep` (was ":"), so A2 also runs on Windows; results on Linux unchanged. Added `eval/run_windows.ps1`,
 `eval/grade_all.py` (calls `grade.grade` unchanged for several question files) and `eval/analyse.py` (protocol section 4).
+2026-11-25, during the runs (harness only): run T3 stopped at once because `--label -off_<check>` was read by argparse as a new
+option; `eval/run_windows.ps1` now passes `--label=-off_<check>`. No answer had been produced; T3 was then run as planned.
