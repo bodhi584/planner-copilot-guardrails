@@ -20,3 +20,6 @@ No check, case card (A1–A5), prompt, prompt rule or grading rule changes from 
 Added the same day, before the freeze and before any test answer: experiment switches in `eval/run.py`
 (`--off`, `--temperature`, `--seed-base`, `--label`; defaults change nothing) and the sealed test questions
 (`cases/*/questions_test.csv`, hashes in `eval/test_set.sha256`).
+2026-11-25, after the freeze, before any test answer (harness only, no rule): `cases/A2_sme/adapter.py` joins the Java
+classpath with `os.pathsep` (was ":"), so A2 also runs on Windows; results on Linux unchanged. Added `eval/run_windows.ps1`,
+`eval/grade_all.py` (calls `grade.grade` unchanged for several question files) and `eval/analyse.py` (protocol section 4).

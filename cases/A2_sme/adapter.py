@@ -12,6 +12,7 @@ What the adapter can change in M3_weekly_backlog.cfg:
   machine_breakdowns : not in the expert model (Zenodo: failures excluded) -> NotImplementedError unless 0.
 Replication i always uses GlobalSubstreamSeed i (common random numbers across scenarios); `start` shifts the index.
 """
+import os
 import re
 import shutil
 import subprocess
@@ -98,7 +99,7 @@ class Adapter:
             raise NotImplementedError("machine breakdowns are not part of the expert JaamSim model (Zenodo: failures excluded)")
         workers, portfolio, L = int(p.get("workers", 3)), str(p.get("portfolio", "norm")), float(p.get("shift_length", 480))
         friday_end_h = (SHIFT_STARTS[-1] + L) / 60.0
-        cp = ":".join(str(self.jaamsim / x) for x in ("classes", "src/main/resources", "jar/jogl-all.jar", "jar/gluegen-rt.jar"))
+        cp = os.pathsep.join(str(self.jaamsim / x) for x in ("classes", "src/main/resources", "jar/jogl-all.jar", "jar/gluegen-rt.jar"))
         with tempfile.TemporaryDirectory(prefix="a2_") as d:
             Path(d, "m.cfg").write_text(self.make_cfg(workers, portfolio, L, n, start), encoding="latin-1")
             for f in ("portf_norm_clean.tsv", "portf_over20_clean.tsv"):
