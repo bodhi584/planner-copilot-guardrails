@@ -42,9 +42,26 @@ In addition, the workflow checks that the number in the final answer is one the 
 
 ## Results
 
-80 questions with fixed correct answers on four published models. Each answer is graded **correct**, **cautious** (no number, or a wrong number that carries a warning) or **confidently wrong**. Same models and questions in three setups:
+### Held-out test (40 sealed questions, rules frozen)
 
-![Results](docs/img/results.png)
+The rules were frozen and the [protocol](eval/PROTOCOL.md) written before 40 new questions (10 per case, other KPIs, scenarios or wordings than in development) were generated and hashed. Three local models, three setups, temperature 0, one RTX 3060:
+
+![Test results](docs/img/results_test.png)
+
+| Model | A · no checks | B · rules in the prompt | C · guardrail engine |
+|---|---|---|---|
+| Qwen 2.5 7B | 16 / 9 / 15 | 22 / 11 / 7 | **37 / 0 / 3** |
+| Gemma 2 9B | 14 / 9 / 17 | 15 / 13 / 12 | **30 / 2 / 8** |
+| Llama 3.1 8B | 13 / 6 / 21 | 14 / 12 / 14 | **27 / 2 / 11** |
+
+*correct / cautious / confidently wrong, of 40. Answers, graded files and statistics: [`eval/results/test/`](eval/results/test/summary.md).*
+
+- **More correct answers with code checks than with the same rules in the prompt, for every model** (paired exact McNemar test, Holm-adjusted p = 0.0004 / 0.0007 / 0.0022). Qwen reaches 92 % correct, the proposal's ≥ 90 % target.
+- **Fewer confidently wrong answers for every model (7→3, 12→8, 14→11), but not significant with 40 questions** (p = 0.17–0.27). The ≤ 2 % target is not met (Qwen: 8 %).
+- The gain sits where a rule is a computation: validity warnings 2/21 → 20/21, numeric answers 27/48 → 43/48 (summed over models). Out-of-scope questions do not improve (18/27 → 16/27): the keyword-based scope check misses rephrased questions.
+- Stable under sampling: Qwen at temperature 0.7, three seeds, setup C: 35, 37, 35 correct.
+
+### Development runs (80 questions)
 
 | Model | A · no checks | B · rules in the prompt | C · guardrail engine |
 |---|---|---|---|
@@ -52,9 +69,9 @@ In addition, the workflow checks that the number in the final answer is one the 
 | Gemma 2 9B | 25 / 19 / 36 | 33 / 30 / 17 | **71 / 5 / 4** |
 | Llama 3.1 8B | 27 / 13 / 40 | 42 / 24 / 14 | **63 / 10 / 7** |
 
-*correct / cautious / confidently wrong, of 80. Details and per-answer files: [`eval/results/`](eval/results/).*
+Two rules were adjusted on these questions ([`eval/rule_changes.md`](eval/rule_changes.md)), so they are not a test; they show where the rules came from. Rerunning Llama on them with the frozen rules gives 64 / 8 / 8 in C.
 
-Writing the rules into the prompt helps, but enforcing them in code helps much more, for all three model families. These are development runs: two rules were adjusted on the same questions ([`eval/rule_changes.md`](eval/rule_changes.md)), so they are not a held-out test. The answer-value check was added after these runs.
+Paper: [`paper/planner_copilot.pdf`](paper/planner_copilot.pdf) (IEEE conference format).
 
 ## Simulation models
 
@@ -110,10 +127,11 @@ Run the evaluation: see [`eval/`](eval/).
 
 ## Limitations
 
-- Scope refusal is keyword-based: an out-of-scope question phrased without a listed keyword can pass.
+- Scope refusal is keyword-based: an out-of-scope question phrased without a listed keyword can pass. In the test this is the largest source of confidently wrong answers in setup C.
+- The value check confirms that a number came from the simulator, not that its unit matches the question (units per hour answered with units per shift).
 - The guardrail is only as good as the case card; where a validated range is an assumption (A2: the fourth worker), the card says so.
 - A1 answers come from stored runs of the four published scenarios; other A1 scenarios would need the 30–45 min simulator runs.
-- Results so far are development results on 80 questions; a held-out test with frozen rules is the next step.
+- 40 test questions are too few to show a significant drop in confidently wrong answers; the test questions were written by the system's author (after the freeze, by script, hashed).
 
 ## Repository
 
@@ -121,7 +139,8 @@ Run the evaluation: see [`eval/`](eval/).
 engine/      check engine, MCP server, tests
 agent/       LangGraph workflow, model client, prompt rules for setup B, tests
 cases/       one folder per simulation model: case card, adapter, reproduction, questions
-eval/        experiment runner, grader, rule-change log, results of runs 1–5
+eval/        experiment runner, grader, test protocol, rule-change log, development runs 1–6 and test runs
+paper/       IEEE-format report (LaTeX source, figures, PDF)
 app/         Gradio web demo
 ```
 

@@ -1,0 +1,20 @@
+Switching off one check at a time in setup C (Qwen, Table~\ref{tab:abl}) shows which checks carry the result on this test set. Without the validity check all seven flag questions become confidently wrong; without adaptive replications a single run replaces the confidence interval and correct answers drop from 37 to 28, mostly on numeric and choice questions; without the scope check three more out-of-scope questions are answered. Switching off the unit, paired-comparison or value check changes no answer: no test question needed a unit conversion of an input, and the paired verdicts were already clear without common random numbers.
+
+\begin{table}[t]
+\caption{Ablation (T3): Qwen 2.5 7B, setup C with one check off}
+\label{tab:abl}
+\centering\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Check switched off & correct & cautious & conf.\ wrong \\
+\midrule
+none (all checks on) & 37 & 0 & 3 \\
+validity & 30 & 0 & 10 \\
+adaptive replications & 28 & 4 & 8 \\
+scope & 34 & 0 & 6 \\
+units & 37 & 0 & 3 \\
+paired comparison & 37 & 0 & 3 \\
+value check & 37 & 0 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}

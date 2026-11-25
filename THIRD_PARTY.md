@@ -10,3 +10,4 @@ The MIT licence above covers the code written for this project. The simulation m
 | A2 | JaamSim simulation software | JaamSim Software Inc. | Apache 2.0 | downloaded and built by `setup.sh` |
 | A3 | Warehouse model and results (Zenodo 10.5281/zenodo.21469786) | Saengphueng (2026) | MIT | `cases/A3_warehouse/model/` with its `LICENSE.txt` |
 | A5 | Model description and published results | M. S. Seppanen (2005), Proc. WSC | — | rebuilt from the paper in `cases/A5_operator_line/model.py` |
+| Paper template | `paper/IEEEtran.cls` (IEEEtran V1.8b) | M. Shell / IEEE | LPPL 1.3 | unchanged |
