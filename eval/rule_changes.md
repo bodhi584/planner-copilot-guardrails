@@ -16,7 +16,7 @@ Not changed on purpose: A3-20 (layout question passed the scope check) and A3-13
 to avoid tuning on test items; they are reported as limitations.
 
 ## 2026-11-25: rules frozen for the test (eval/PROTOCOL.md)
-No check, case card (A1–A5), prompt, prompt rule or grading rule changes from here on (tag `eval-freeze-v1`).
+No check, case card (A1–A5), prompt, prompt rule or grading rule changes from here on (commit `35a22f5`).
 Added the same day, before the freeze and before any test answer: experiment switches in `eval/run.py`
 (`--off`, `--temperature`, `--seed-base`, `--label`; defaults change nothing) and the sealed test questions
 (`cases/*/questions_test.csv`, hashes in `eval/test_set.sha256`).

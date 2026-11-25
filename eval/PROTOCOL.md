@@ -8,7 +8,7 @@ test run; a harness bug found later is fixed, logged in `rule_changes.md` and ev
 
 | Part | Frozen state |
 |---|---|
-| Check engine, case cards A1–A5, prompts, prompt rules (setup B), grader | git tag `eval-freeze-v1` |
+| Check engine, case cards A1–A5, prompts, prompt rules (setup B), grader | commit `35a22f5` (branch `eval-v1`) |
 | Value check (`value_not_from_tool`) | on in setup C (added after the development runs, so it is new to every model) |
 | Test questions | `cases/*/questions_test.csv` (split = `test`), SHA-256 in `eval/test_set.sha256` |
 
