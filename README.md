@@ -4,6 +4,8 @@
 
 **Checked answers to production-planning questions, from validated simulation models, driven by a small local language model.**
 
+**[Try the web demo](https://bodhi584.github.io/planner-copilot-guardrails/demo/)** – no installation: change the inputs of four factory models and see the checked answers, or replay the sealed test question by question.
+
 A planner asks in plain language: *“Busy week with 20 % more orders and only 2 workers: how many hours after the Friday shift?”* A language model on the company’s own computer turns the question into a simulation scenario. A guardrail engine written in code decides whether the answer can be trusted: it checks the inputs against what the published model was validated for, runs enough replications for a 95 % confidence interval, and returns one of three outcomes:
 
 | Outcome | When | Example (sheet-metal job shop) |
@@ -143,7 +145,8 @@ agent/       LangGraph workflow, model client, prompt rules for setup B, tests
 cases/       one folder per simulation model: case card, adapter, reproduction, questions
 eval/        experiment runner, grader, test protocol, rule-change log, development runs 1–6 and test runs
 paper/       IEEE-format report (LaTeX source, figures, PDF)
-app/         Gradio web demo
+app/         Gradio web demo (local)
+docs/demo/   static web demo for GitHub Pages (make_demo.py builds it)
 ```
 
 ## References

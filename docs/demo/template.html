@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planner Copilot – demo</title>
+<style>
+:root{--ink:#1d2433;--mute:#5d6678;--line:#e3e6ec;--bg:#f7f8fa;--card:#fff;--acc:#2f5bd3;
+--ok:#1f7a4d;--okb:#e6f4ec;--warn:#9a5b00;--warnb:#fff3df;--bad:#b3261e;--badb:#fdeceb;--grey:#eef0f4}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:var(--card);border-bottom:1px solid var(--line)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header .wrap{padding:22px 20px 0}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--mute);margin:0 0 14px;max-width:760px}
+.links a{color:var(--acc);text-decoration:none;margin-right:16px;font-size:14px}
+nav{display:flex;gap:4px;margin-top:16px}
+nav button{border:0;background:none;padding:10px 14px;font:inherit;color:var(--mute);cursor:pointer;border-bottom:2px solid transparent}
+nav button.on{color:var(--ink);border-bottom-color:var(--acc);font-weight:600}
+main.wrap{padding:22px 20px 40px}.tab{display:none}.tab.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.grid2{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:18px}
+@media(max-width:780px){.grid2{grid-template-columns:1fr}.cols{grid-template-columns:1fr!important}}
+label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
+select{width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff}
+.hint{font-size:12px;color:var(--mute);margin-top:3px}
+.res h2{font-size:28px;margin:4px 0}.res .kpi{color:var(--mute);font-size:14px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.p-ok{background:var(--okb);color:var(--ok)}.p-warn{background:var(--warnb);color:var(--warn)}.p-bad{background:var(--badb);color:var(--bad)}.p-grey{background:var(--grey);color:var(--mute)}
+.box{border-radius:8px;padding:10px 12px;margin-top:12px;font-size:14px}
+.b-warn{background:var(--warnb);color:#5c3800}.b-bad{background:var(--badb);color:#6b1610}.b-ok{background:var(--okb);color:#0f4a2d}
+ul.cn{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--mute)}
+.qpick{display:grid;grid-template-columns:1fr 200px;gap:12px}
+.q{font-size:17px;margin:14px 0 4px;font-weight:600}.ref{font-size:13px;color:var(--mute)}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.col h3{font-size:14px;margin:0 0 2px}.col .d{font-size:12px;color:var(--mute);margin-bottom:10px}
+.ans{font-size:14px;min-height:60px}
+details{margin-top:10px;font-size:12px;color:var(--mute)}summary{cursor:pointer}
+code{font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;background:var(--grey);padding:1px 4px;border-radius:4px;word-break:break-word}
+.tl{margin:6px 0 0;padding-left:18px}.tl li{margin-bottom:4px}
+.bars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+.bar{height:10px;border-radius:5px;background:var(--grey);display:flex;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%}.leg{font-size:12px;color:var(--mute)}
+.note{font-size:12px;color:var(--mute);margin-top:14px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>Planner Copilot</h1>
+<p class="sub">A small local language model answers production-planning questions through validated simulation models. Checks written in code decide the outcome: an answer with a 95 % confidence interval, an answer with a warning, or a refusal.</p>
+<div class="links"><a href="https://github.com/bodhi584/planner-copilot-guardrails">GitHub repository</a><a href="https://github.com/bodhi584/planner-copilot-guardrails/blob/main/paper/planner_copilot.pdf">Report (IEEE format, 4 pages)</a></div>
+<nav><button class="on" data-t="t1">1 · Try the check engine</button><button data-t="t2">2 · Replay the sealed test</button></nav>
+</div></header>
+<main class="wrap">
+<section id="t1" class="tab on">
+<div class="grid2">
+<div class="card">
+<label>Factory</label><select id="case"></select>
+<div id="params"></div>
+<label>Output</label><select id="kpi"></select>
+<div class="note">Try an input outside the validated range, e.g. 2 workers in a busy week (A2) or 5 operators (A5).</div>
+</div>
+<div>
+<div class="card res" id="res"></div>
+<div class="card" style="margin-top:14px"><b style="font-size:14px">This model cannot answer</b><ul class="cn" id="cannot"></ul>
+<div class="hint" style="margin-top:8px">Questions like these are refused by the scope check (see tab 2).</div></div>
+</div>
+</div>
+<p class="note">Every result on this page was computed by the engine in the repository (<code>engine.estimate</code>) for each input combination offered here, with the same adaptive replications and checks; the page shows the stored results, so nothing needs to be installed. A2 runs JaamSim, A3 and A5 run SimPy, A1 answers from stored runs of the SMT2020 fab simulator.</p>
+</section>
+<section id="t2" class="tab">
+<div class="card">
+<div class="qpick"><div><label>Sealed test question (40, written after the rules were frozen)</label><select id="q"></select></div>
+<div><label>Local model</label><select id="model"></select></div></div>
+<div class="q" id="qtext"></div><div class="ref" id="qref"></div>
+<div class="cols" id="cols"></div>
+</div>
+<div class="card" style="margin-top:14px"><b style="font-size:14px">All 40 questions, this model</b>
+<div class="bars" id="bars"></div>
+<div class="leg" style="margin-top:8px"><span class="pill p-ok">correct</span> <span class="pill p-warn">cautious</span> <span class="pill p-bad">confidently wrong</span></div></div>
+<p class="note">Recorded answers from the pre-registered test (temperature 0, Ollama on an RTX 3060), graded automatically against reference values from the published models. Same model, same tools in all three setups; only where the rules live differs.</p>
+</section>
+</main>
+<script>
+const D=__DATA__;
+const $=s=>document.querySelector(s);
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.t).classList.add('on')});
+const NAMES={A2_sme:'A2 · Sheet-metal job shop',A3_warehouse:'A3 · Pallet warehouse',A5_operator_line:'A5 · Operator-paced assembly line',A1_smt2020:'A1 · Semiconductor wafer fab'};
+const LABEL={portfolio:{norm:'normal week',over20:'busy week (+20 % orders)'}};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=x=>x==null?'–':Math.abs(x)>=1000?Math.round(x).toLocaleString('en'):(+x).toPrecision(3).replace(/\.?0+$/,'');
+// ---------- tab 1
+function opts(c){const keys=Object.keys(D.cases[c].res).map(k=>JSON.parse(k.split('|')[0]));const o={};keys.forEach(p=>Object.entries(p).forEach(([k,v])=>{(o[k]=o[k]||new Set()).add(v)}));return o}
+function initCase(){const c=$('#case').value,C=D.cases[c],o=opts(c);let h='';
+ for(const[k,set]of Object.entries(o)){const p=C.params.find(x=>x.name===k)||{};const vals=[...set];
+  const rng=p.allowed?'':(p.valid_min!=null?`validated ${p.valid_min}–${p.valid_max} ${p.unit||''}`:'');
+  const def=vals.includes(p.default)?p.default:vals[0];
+  h+=`<label>${k.replace(/_/g,' ')}</label><select data-p="${k}">${vals.map(v=>`<option value='${JSON.stringify(v)}' ${v===def?'selected':''}>${esc((LABEL[k]||{})[v]||v)}${p.valid_min!=null&&(v<p.valid_min||v>p.valid_max)?'  (outside validated range)':''}</option>`).join('')}</select>${rng?`<div class="hint">${rng}</div>`:''}`}
+ $('#params').innerHTML=h;$('#kpi').innerHTML=C.outputs.map(o=>{const[n,u]=o.split('|');return`<option value="${n}">${n.replace(/_/g,' ')}${u?' ('+u+')':''}</option>`}).join('');
+ $('#cannot').innerHTML=C.cannot.map(x=>`<li>${esc(x)}</li>`).join('');
+ document.querySelectorAll('#params select,#kpi').forEach(s=>s.onchange=run);run()}
+function run(){const c=$('#case').value,p={};document.querySelectorAll('#params select').forEach(s=>p[s.dataset.p]=JSON.parse(s.value));
+ const key=JSON.stringify(Object.fromEntries(Object.keys(p).sort().map(k=>[k,p[k]])))+'|'+$('#kpi').value;const r=D.cases[c].res[key];let h;
+ if(!r){h='<p>No stored result.</p>'}
+ else if(r.s==='error'){h=`<span class="pill p-bad">input rejected</span><h2>No answer</h2><div class="box b-bad">${esc(r.e)}</div><div class="hint" style="margin-top:8px">Unit / plausibility check: the simulation is not run at all.</div>`}
+ else if(r.s==='refused'){h=`<span class="pill p-bad">refused</span><h2>No answer</h2>`}
+ else{const warn=r.w.length;h=`<span class="pill ${warn?'p-warn':'p-ok'}">${warn?'answer with warning':'checked answer'}</span>
+ <div class="kpi" style="margin-top:10px">${$('#kpi').selectedOptions[0].text}</div><h2>${fmt(r.m)} ${esc(r.u||'')}</h2>
+ <div class="kpi">95 % CI [${fmt(r.ci?.[0])}, ${fmt(r.ci?.[1])}] · ${r.n} replications${r.pr===false?'':' · precision reached'}</div>
+ ${r.w.map(w=>`<div class="box b-warn">⚠ ${esc(w)}</div>`).join('')}
+ ${warn?'':'<div class="box b-ok">Inputs inside the validated range; replications added until the 95 % interval was narrow enough.</div>'}`}
+ $('#res').innerHTML=h}
+$('#case').innerHTML=Object.keys(D.cases).map(c=>`<option value="${c}">${NAMES[c]}</option>`).join('');$('#case').onchange=initCase;initCase();
+// ---------- tab 2
+const MODELS=[...new Set(Object.keys(D.ans).map(k=>k.split('|')[0]))];
+const ARMS=[['A','A · No checks','tools only'],['B','B · Rules in the prompt','same rules, written as text'],['C','C · Code checks','rules enforced by the engine']];
+const OUT={correct:['p-ok','correct'],cautious:['p-warn','cautious'],confidently_wrong:['p-bad','confidently wrong']};
+const TYPE={numeric:'number',choice:'which option',flag:'outside validated range',scope:'not answerable'};
+$('#model').innerHTML=MODELS.map(m=>`<option>${m}</option>`).join('');
+$('#q').innerHTML=D.qs.map(q=>`<option value="${q.qid}">${q.qid} · ${esc(q.question.slice(0,90))}${q.question.length>90?'…':''}</option>`).join('');
+function refText(q){if(q.type==='numeric')return`Reference: ${q.reference} (accepted ${q.tol_low}–${q.tol_high}) · ${esc(q.source)}`;
+ if(q.type==='choice')return`Reference: ${esc(q.choices_ok)} · ${esc(q.source)}`;
+ if(q.type==='flag')return`Expected: answer with an "outside validated range" warning · ${esc(q.source)}`;return`Expected: refusal · ${esc(q.source)}`}
+function tool(t){return`<li><code>${esc(t[0])}</code> ${t[1]?'<code>'+esc(JSON.stringify(t[1]))+'</code>':''} → ${esc(t[2])}${t[3]&&t[3].length?' ⚠ '+esc(t[3].join(', ')):''}</li>`}
+function showQ(){const q=D.qs.find(x=>x.qid===$('#q').value),m=$('#model').value;
+ $('#qtext').textContent=q.question;$('#qref').innerHTML=`<span class="pill p-grey">${TYPE[q.type]}</span> ${NAMES[q.case_id]} · ${refText(q)}`;
+ $('#cols').innerHTML=ARMS.map(([a,t,d])=>{const r=D.ans[`${m}|${q.qid}|${a}`];const o=OUT[r.o];
+  const head=r.r?'<b>Refused.</b> ':(r.v||r.c?`<b>${esc(r.v||r.c)}</b> · `:'');
+  return`<div class="card col"><h3>${t}</h3><div class="d">${d}</div><span class="pill ${o[0]}">${o[1]}</span>
+  <div class="ans" style="margin-top:8px">${head}${esc(r.t)}</div>${r.f&&a==='C'?`<div class="hint">flags: ${esc(r.f)}</div>`:''}
+  <details><summary>${r.tl.length} tool call${r.tl.length===1?'':'s'}</summary><ol class="tl">${r.tl.map(tool).join('')||'<li>none</li>'}</ol></details></div>`}).join('')}
+function bars(){const m=$('#model').value;$('#bars').innerHTML=ARMS.map(([a,t])=>{const c={correct:0,cautious:0,confidently_wrong:0};D.qs.forEach(q=>c[D.ans[`${m}|${q.qid}|${a}`].o]++);
+ return`<div><div style="font-size:13px">${t}: <b>${c.correct}</b>/40 correct, ${c.confidently_wrong} confidently wrong</div><div class="bar"><i style="width:${c.correct*2.5}%;background:var(--ok)"></i><i style="width:${c.cautious*2.5}%;background:#e2a33b"></i><i style="width:${c.confidently_wrong*2.5}%;background:var(--bad)"></i></div></div>`}).join('')}
+$('#q').onchange=showQ;$('#model').onchange=()=>{showQ();bars()};$('#q').value='A2-T08';showQ();bars();
+</script>
+</body>
+</html>
